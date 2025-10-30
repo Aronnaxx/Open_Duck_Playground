@@ -9,3 +9,4 @@ checkpoints/
 .tmp/
 *.onnx
 *.TXT
+open_duck_reference_motion_generator/__pycache__/
