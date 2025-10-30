@@ -11,6 +11,10 @@ use thiserror::Error;
 type Polynomial = Vec<f64>;
 type PolynomialSet = Vec<Polynomial>;
 type MotionGrid = Vec<Vec<Vec<PolynomialSet>>>;
+type MotionLookup = BTreeMap<
+    OrderedFloat<f64>,
+    BTreeMap<OrderedFloat<f64>, BTreeMap<OrderedFloat<f64>, PolynomialSet>>,
+>;
 
 #[derive(Debug, Error)]
 pub enum MotionError {
@@ -54,6 +58,7 @@ pub struct MotionRecord {
 }
 
 impl MotionRecord {
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         dx: f64,
         dy: f64,
@@ -120,10 +125,7 @@ impl PolyReferenceMotion {
         let mut dys = BTreeSet::new();
         let mut dthetas = BTreeSet::new();
 
-        let mut map: BTreeMap<
-            OrderedFloat<f64>,
-            BTreeMap<OrderedFloat<f64>, BTreeMap<OrderedFloat<f64>, PolynomialSet>>,
-        > = BTreeMap::new();
+        let mut map: MotionLookup = BTreeMap::new();
 
         let base_frame_offsets = base
             .frame_offsets

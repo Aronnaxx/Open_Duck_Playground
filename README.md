@@ -40,9 +40,7 @@ uv run playground/open_duck_mini_v2/mujoco_infer.py -o <path_to_.onnx>
 
 ## Rust port
 
-An initial Rust translation of the playground lives in [`rust_port/`](rust_port). The crate currently implements the polynomial
-reference motion loader along with the action filtering utilities and is designed to be extended with the rest of the simulation
-stack.
+An initial Rust translation of the playground lives in [`rust_port/`](rust_port). The crate implements the polynomial reference motion loader, low-pass action filters, and now includes Rust-native facsimiles of the MuJoCo viewer and training runner utilities so they can be orchestrated from strongly typed code.
 
 ```
 cargo test --manifest-path rust_port/Cargo.toml
@@ -66,8 +64,9 @@ Each record in the JSON array must provide the velocity triple and the polynomia
 ]
 ```
 
-The loader mirrors the selection logic from the Python version by clamping velocities to the available ranges and sampling the
-polynomials via Horner's method. Additional records can be appended to cover new gait targets.
+The loader mirrors the selection logic from the Python version by clamping velocities to the available ranges and sampling the polynomials via Horner's method. Additional records can be appended to cover new gait targets. The viewer module reproduces the keyboard and joystick command mapping and generates target joint poses directly from the Rust motion loader. The runner module provides generic hooks for PPO-style trainers by abstracting metric logging, checkpointing and ONNX exports behind traits, allowing consumers to plug in custom backends while reusing the original workflow structure.
+
+The viewer integrates with [`mujoco-rs`](https://crates.io/crates/mujoco-rs) behind an optional `mujoco` Cargo feature. Enabling the feature allows the passive viewer to stream reference poses to MuJoCo's Rust-native renderer while leaving the remainder of the API available without linking to the MuJoCo binaries.
 
 # Documentation
 
