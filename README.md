@@ -38,6 +38,37 @@ Infer mujoco
 uv run playground/open_duck_mini_v2/mujoco_infer.py -o <path_to_.onnx>
 ```
 
+## Rust port
+
+An initial Rust translation of the playground lives in [`rust_port/`](rust_port). The crate currently implements the polynomial
+reference motion loader along with the action filtering utilities and is designed to be extended with the rest of the simulation
+stack.
+
+```
+cargo test --manifest-path rust_port/Cargo.toml
+```
+
+Reference motions can be instantiated from JSON definitions that mirror the structure of the original polynomial coefficients.
+Each record in the JSON array must provide the velocity triple and the polynomial coefficients expressed in ascending order:
+
+```json
+[
+  {
+    "dx": 0.0,
+    "dy": 0.0,
+    "dtheta": 0.0,
+    "period": 1.0,
+    "fps": 60.0,
+    "frame_offsets": [0, 30],
+    "startend_double_support_ratio": 0.25,
+    "coefficients": [[0.0, 0.5, -0.1], [1.2, 0.0]]
+  }
+]
+```
+
+The loader mirrors the selection logic from the Python version by clamping velocities to the available ranges and sampling the
+polynomials via Horner's method. Additional records can be appended to cover new gait targets.
+
 # Documentation
 
 ## Project structure : 
